@@ -22,9 +22,9 @@ class StudyGui(object):
 
         self.win = Tk()
         self.win.title('EEG Study')
-        self.image_dir = glob.glob('/Images/Images/')
-        self.shapes_dir = glob.glob('/Images/Basic shapes/')
-        self.colours_dir = glob.glob('./Images/Colours/*.jpg')
+        #self.image_dir = glob.glob('/Images/Images/')
+        #self.shapes_dir = glob.glob('/Images/Basic shapes/')
+        #self.colours_dir = glob.glob('./Images/Colours/*')
         self.counter = 0
         # Create the containers to hold widgets
 
@@ -124,11 +124,16 @@ class StudyGui(object):
                     pass
 
         def openImages(self):
+            """
+            This function opens the images that were chosen by the user.
+            It uses the variable that is stored from the drop down menu, image_var.
+            Then loops through the directory and creates image objects that it stores in a list that is then returned.
+            """
             img_list = []
-            for i in range(len(self.colours_dir)):
-                x = ImageTk.PhotoImage(Image.open(self.colours_dir[i]))
+            self.image_dir = glob.glob('./Images/%s/*' % self.image_var.get())
+            for i in range(len(self.image_dir)):
+                x = ImageTk.PhotoImage(Image.open(self.image_dir[i]))
                 img_list.append(x)
-                print('tjo')
             return img_list
 
         self.study_screen=Toplevel(bg='black')
@@ -153,8 +158,8 @@ class StudyGui(object):
         self.image_label.pack()
         self.image_list = openImages(self)
         # Remove the Label when any key is pressed
-        self.study_screen.bind('<Return>',removeInstr, showImage(self.counter))
-        #self.study_screen.bind('<F1>', showImage(self.counter))
+        #self.study_screen.bind('<Return>',removeInstr)
+        self.study_screen.bind('<Return>', removeInstr, showImage(self.counter))
         self.study_screen.bind("<Escape>", lambda e: e.widget.quit())
 
 eeg = StudyGui()
