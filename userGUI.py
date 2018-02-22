@@ -125,7 +125,6 @@ class UserGUI(object):
         self.pluginsFrame.grid(column=0, row=6, padx=20, columnspan=5, sticky=tk.S)
 
 
-
         # Using a trick to let the plugins know about the window for plugin settings.
         # We will normally just have a single window instance for each run.
         #
@@ -277,7 +276,6 @@ class UserGUI(object):
         # Loop counters can still be needed.
         #
         i = 0  # Initiating the loop counter
-        newVar = ''
         #
         # Go through all the plugins and render them into a list of items which can be used to
         # address the contents of the selected items.
