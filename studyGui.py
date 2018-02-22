@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import glob
 from PIL import Image, ImageTk
-from random import randint
+import random
 
 #from yapsy.PluginManager import PluginManager
 TIME = [
@@ -21,10 +21,10 @@ IMAGES = [
 ]
 class StudyGui(object):
 
+    def __init__(self):
+    #def __init__(self,parent):
 
-    def __init__(self, parent):
-
-        self.caller = parent
+        #self.caller = parent
 
         # TODO parent is the plugin object, and this is for a callback, when pictures are switched.
         # See showImage() below
@@ -33,10 +33,12 @@ class StudyGui(object):
         #
         self.win = Tk()
         self.win.title('EEG Study')
-        self.image_dir = glob.glob('/Images/Images/')
-        self.shapes_dir = glob.glob('/Images/Basic shapes/')
-        self.colours_dir = glob.glob('./Images/Colours/*.jpg')
         self.counter = 0
+
+        # Open the image used for the pause between images
+        #
+        self.im = glob.glob('./Images/Pause/*')
+        self.black_screen = ImageTk.PhotoImage(Image.open(self.im[0]))
 
         # Create the containers to hold widgets
 
@@ -109,6 +111,12 @@ class StudyGui(object):
         self.sel_order2 = Radiobutton(self.labelsFrame1, text = "Random", variable = self.order_var, value = 1).grid(row=3, column=1, sticky=W)
         self.label_sel_order = Label(self.labelsFrame1, text="Select order:").grid(row=2, column=0, sticky=W)
 
+        # Check button for pauses
+        #
+        self.pause_var = IntVar()
+        self.pause_button = Checkbutton(self.labelsFrame1, text='Use black screen between images', variable=self.pause_var, pady=10)
+        self.pause_button.grid(row=5,column=0, sticky=E)
+
         #Add startbutton
         #
         self.start_button = Button(self.buttonFrame, text='Start Study', padx=10, command=self.studyStart).grid(row=0, column=1)
@@ -140,23 +148,39 @@ class StudyGui(object):
             self.study_instructions.pack_forget()
 
         def showImage(counter, event=None):
-            print(counter)
             if self.order_var.get() == 0:
                 if counter < len(self.image_list):
                     self.im = self.image_list[counter]
                     self.image_label.configure(image=self.im)
-                    self.caller.trigger(counter);
+                    #self.caller.trigger(counter)
                     counter += 1
-                    self.study_screen.after(self.time_var.get()*1000, showImage, counter)
-                else:
-                    pass
+                    self.study_screen.after(self.time_var.get()*1000, showBlack, counter)
+            else:
+                if counter < len(self.image_list):
+                    self.im = self.image_list[self.ran_list[counter]]
+                    self.image_label.configure(image=self.im)
+                    #self.caller.trigger(counter)
+                    counter += 1
+                    self.study_screen.after(self.time_var.get()*1000, showBlack, counter)
+
+        def randomize(self):
+            ran_list = list(range(len(self.image_dir)))
+            random.shuffle(ran_list)
+            return ran_list
+
+        def showBlack(counter):
+            if self.pause_var.get() == 1:
+                self.image_label.configure(image=self.black_screen)
+                self.study_screen.after(5000, showImage, counter)
+            else:
+                showImage(counter)
 
         def openImages(self):
             img_list = []
-            for i in range(len(self.colours_dir)):
-                x = ImageTk.PhotoImage(Image.open(self.colours_dir[i]))
+            self.image_dir = glob.glob('./Images/%s/*' % self.image_var.get())
+            for i in range(len(self.image_dir)):
+                x = ImageTk.PhotoImage(Image.open(self.image_dir[i]))
                 img_list.append(x)
-                print('tjo')
             return img_list
 
         self.study_screen=Toplevel(bg='black')
@@ -182,13 +206,18 @@ class StudyGui(object):
         self.study_instructions.pack()
         self.image_label = Label(self.study_screen)
         self.image_label.pack()
+
+        #Open the images and put into a list
+        #
         self.image_list = openImages(self)
 
-        # Remove the Label when any key is pressed
+        #Create a list of the random indexes that will be used in showImage
+        self.ran_list = randomize(self)
+
+        # Remove the Label and start the study when Return is pressed
         #
         self.study_screen.bind('<Return>',removeInstr, showImage(self.counter))
 
-        #self.study_screen.bind('<F1>', showImage(self.counter))
         #
         self.study_screen.bind("<Escape>", lambda e: e.widget.quit())
 
