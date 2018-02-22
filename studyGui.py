@@ -171,7 +171,7 @@ class StudyGui(object):
         def showBlack(counter):
             if self.pause_var.get() == 1:
                 self.image_label.configure(image=self.black_screen)
-                self.study_screen.after(5000, showImage, counter)
+                self.study_screen.after(3000, showImage, counter)
             else:
                 showImage(counter)
 
