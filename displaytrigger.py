@@ -4,7 +4,9 @@ import glob
 from PIL import Image, ImageTk
 import random
 
+
 #from yapsy.PluginManager import PluginManager
+
 TIME = [
     5,
     10,
@@ -12,16 +14,20 @@ TIME = [
     20
 ]
 
-
-
 IMAGES = [
     'Colours',
     'Basic shapes',
     'Images'
 ]
+
+
+
 class StudyGui(object):
 
+    study = False
+
     def __init__(self):
+
     #def __init__(self,parent):
 
         #self.caller = parent
@@ -133,14 +139,20 @@ class StudyGui(object):
     def reset(self):
         self.win.quit()
 
+    # Responsible for the connection between plugin and this program
+    #
+    def newImage(self):
+        # TODO Connect to the "call" function in pl
+        self.study = True
 
-    def connect_board(self):
-        pass
+
+    def betweenImage(self):
+        self.study = False
+
 
     # ====================================
     # Create a fullscreen Toplevel window
     # ====================================
-    #
     #
     def studyStart(self):
 
@@ -221,6 +233,9 @@ class StudyGui(object):
         #
         self.study_screen.bind("<Escape>", lambda e: e.widget.quit())
 
-eeg = StudyGui()
 
-eeg.start()
+eeg = StudyGui()  # läggs i collect-plugin
+
+
+eeg.start()       # läggs i collect-plugin
+

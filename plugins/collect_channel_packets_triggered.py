@@ -1,8 +1,12 @@
 #!/usr/bin/env python3.6
 """
-This plugin collects data for deep learning purposes. It utilises a value flag to store the output variable (y_value)
-and saves the polled data in a large nympy array (+ writing it to a text file.
+This plugin collects data for deep learning purposes. It utilises a value flag to store the
+output variable (y_value) and saves the polled data in a large nympy array (+ writing it to
+a text file.
 
+The data is collected in a way that makes it possible to use triggers, such as images, colours,
+etc. The data is collected with timed packets, so as to distinguish intervalsa in connection
+with the presentation of teh visual stimuli.
 
 """
 # IMPORTS
@@ -28,6 +32,61 @@ class PluginChanCollect(plugintypes.IPluginExtended):
 
     __main_instance__ = None
 
+    # ========================================================================
+    # The array is used to access the trigger values quickly.
+    # Example values are:
+
+    ## No stimuli
+
+    # 0 - black screen before each stimuli presentation
+
+    ## Perception phase
+
+    # 1 - stimuli presentation -- 0,0 - 0,1 s
+    # 2 - stimuli presentation -- 0,1 - 0,2 s
+
+    ## Recognition phase
+
+    # 3 - stimuli presentation -- 0,2 - 0,3 s
+    # 4 - stimuli presentation -- 0,3 - 0,4 s
+
+    ## Cognition phase
+
+    # 5 - stimuli presentation -- 0,4 - 0,5
+    # 6 - stimuli presentation -- 0,5 - 0,6
+
+    ## Permanent showing the stimuli'
+
+    # 7 - permanent stimuli -- 0,6 -
+
+    triggerval = [[1, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # 0
+                  [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],  # 1
+                  [0, 0, 1, 0, 0, 0, 0, 0, 0, 0],  # 2
+                  [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],  # 3
+                  [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],  # 4
+                  [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],  # 5
+                  [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],  # 6
+                  [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],  # 7
+                  [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],  # 8
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 1],  # 9
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # 10
+                  ]
+
+    # We want to put the same values in string format, just in case.'
+    #
+    triggervalstr = ["[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]",  # 0
+                     "[0, 1, 0, 0, 0, 0, 0, 0, 0, 0]",  # 1
+                     "[0, 0, 1, 0, 0, 0, 0, 0, 0, 0]",  # 2
+                     "[0, 0, 0, 1, 0, 0, 0, 0, 0, 0]",  # 3
+                     "[0, 0, 0, 0, 1, 0, 0, 0, 0, 0]",  # 4
+                     "[0, 0, 0, 0, 0, 1, 0, 0, 0, 0]",  # 5
+                     "[0, 0, 0, 0, 0, 0, 1, 0, 0, 0]",  # 6
+                     "[0, 0, 0, 0, 0, 0, 0, 1, 0, 0]",  # 7
+                     "[0, 0, 0, 0, 0, 0, 0, 0, 1, 0]",  # 8
+                     "[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]",  # 9
+                     "[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",  # 10
+                  ]
+
     def __init__(self, file_name="chanpackets", delim=",", verbose=True):
 
         # The y_value is used to store the current flag_value for the output categories in keras.
@@ -36,12 +95,20 @@ class PluginChanCollect(plugintypes.IPluginExtended):
 
         __main_instance__ = self
 
+        # Initialise the image display program
+        #
+        trigger = trig.StudyGui()
+
+        # Set current time at the initialisation
+        #
         now = datetime.datetime.now()
 
         self.format = "NP"
 
         self.panel = main_window.UserGUI.__pluginSpace__
 
+        # Initialise all the data about this session.
+        #
         self.time_stamp = '%d-%d-%d_%d-%d-%d' % (now.year, now.month, now.day, now.hour, now.minute, now.second)
         self.file_name = self.time_stamp
         self.start_time = timeit.default_timer()
@@ -62,12 +129,18 @@ class PluginChanCollect(plugintypes.IPluginExtended):
         self.t2 = 0.0
         self.break_time = 0.3
 
-        self.pack_size = 30
+        # The packet size is set to 16, since we are using 16 channels. Should we use just 8 channels,
+        # we need to set this number to 8 as well. The packets should be of the size x * x in order for
+        # certain neural network methods to work.
+        #
+        self.pack_size = 16
+
+        # We need to have a counter for the number of packets.
         self.no_of_packets = 0
+
 
     def activate(self):
 
-        self.trigger = trig.Displaytrigger()
 
         if len(self.args) > 0:
             if 'no_time' in self.args:
@@ -126,8 +199,11 @@ class PluginChanCollect(plugintypes.IPluginExtended):
     def show_help(self):
         print("Optional argument: [filename] (default: collect.csv)")
 
-
     def __call__(self,sample):
+
+        if self.trigger.study:
+            pass
+
 
         t = timeit.default_timer() - self.start_time
 
@@ -272,7 +348,7 @@ class PluginChanCollect(plugintypes.IPluginExtended):
     # TODO check if this needs to specifically threaded.
     #
 
-
+    #
     def open_control_window(self):
 
         # ========================
