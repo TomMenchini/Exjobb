@@ -8,6 +8,8 @@ The data is collected in a way that makes it possible to use triggers, such as i
 etc. The data is collected with timed packets, so as to distinguish intervalsa in connection
 with the presentation of teh visual stimuli.
 
+The trigger mechanism is available in the file displaytrigger.py
+
 """
 # IMPORTS
 #
@@ -28,7 +30,7 @@ import userGUI as main_window
 
 import displaytrigger as trig
 
-class PluginChanCollect(plugintypes.IPluginExtended):
+class PluginChanCollectTrig(plugintypes.IPluginExtended):
 
     __main_instance__ = None
 
@@ -58,6 +60,8 @@ class PluginChanCollect(plugintypes.IPluginExtended):
     ## Permanent showing the stimuli'
 
     # 7 - permanent stimuli -- 0,6 -
+
+
 
     triggerval = [[1, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # 0
                   [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],  # 1
@@ -95,7 +99,7 @@ class PluginChanCollect(plugintypes.IPluginExtended):
 
         __main_instance__ = self
 
-        # Initialise the image display program
+        # Initialise the image display program -- the sensory trigger.
         #
         trigger = trig.StudyGui()
 
@@ -163,6 +167,8 @@ class PluginChanCollect(plugintypes.IPluginExtended):
         win_thread = threading.Thread(target=self.open_control_window)
         win_thread.start()
 
+        # Here we create the trigger value.
+        #
         self.trigval = self.trigger.connect()
         self.trigger.displaythread.start()
 
