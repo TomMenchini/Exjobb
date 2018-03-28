@@ -22,7 +22,7 @@ import plugin_interface as plugintypes
 
 import userGUI as main_window
 
-import displaytrigger as trig
+# import displaytrigger as trig
 
 class PluginChanCollect(plugintypes.IPluginExtended):
 

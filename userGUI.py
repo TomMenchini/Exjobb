@@ -76,6 +76,7 @@ class UserGUI(object):
         #
         self.win = tk.Tk()
         self.win.title(dict.get_string('wintitle'))
+
         #
         # ==========================
         # Set minimal logging level
@@ -254,6 +255,7 @@ class UserGUI(object):
             dchan_check.grid(row=chan + 1, column=1, sticky=tk.W)
             self.dchancheckboxes.append(dchan_check)
 
+
         print(self.chan_val)
 
         # ==============================================================================
@@ -367,7 +369,7 @@ class UserGUI(object):
             else:
                 for chan in self.dchancheckboxes:
                     chan.config(state="disabled")
-            #
+
             # A little unusual way to choose implementation but it works. We should not normally import anything here
             # in the file. See also the alternative import for ganglion as bci below.
             #

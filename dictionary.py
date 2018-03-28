@@ -28,6 +28,7 @@ class Dictionary(object):
         ['daisychan', 'On Daisy board', 'På Daisy'],
         ['deactivate_plug', 'Deactivating Plugins...', 'Avaktiverar plugin-moduler...'],
         ['selport', 'Select port', 'Välj port'],
+        ['selchan', 'Select board and channels', 'Välj kanaler'],
         ['cancel', 'Cancel', 'Ångra'],
         ['end_byte', 'ID: <%dic> <Unexpected END_BYTE found <%s> instead of <%s>',
          'ID-nummer: <%dic> Oväntat slut med BYTE %dic hittat i filen istället för %s'],
@@ -68,7 +69,7 @@ class Dictionary(object):
         for item in Dictionary.dic:
             if item[0] == key:
                 return item[Dictionary.lang]
-        return "§§§ Missing text §§§"
+        return "§§§ Missing text --> " + key;
 
     # ============================================
     # Sets the language of the User Interface
