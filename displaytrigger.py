@@ -18,6 +18,7 @@ IMAGES = [
     'Colours',
     'Basic shapes',
     'Images'
+    'Affective Images'
 ]
 
 
@@ -88,9 +89,9 @@ class StudyGui(object):
         # Add an actions menu
         # Placeholder code so I can see how to write menus
         #
-        self.actionMenu = Menu(self.menuBar, tearoff=1)
-        self.actionMenu.add_command(label="Initialise board", command=self.connect_board, accelerator="Cmd+I")
-        self.menuBar.add_cascade(label="Actions", menu=self.actionMenu)
+        #self.actionMenu = Menu(self.menuBar, tearoff=1)
+        #self.actionMenu.add_command(label="Initialise board", command=self.connect_board, accelerator="Cmd+I")
+        #self.menuBar.add_cascade(label="Actions", menu=self.actionMenu)
 
         # =====================
         # Adding settings menu
@@ -116,7 +117,7 @@ class StudyGui(object):
         self.sel_order1 = Radiobutton(self.labelsFrame1, text = "Set", variable = self.order_var, value = 0).grid(row=2, column=1, sticky=W)
         self.sel_order2 = Radiobutton(self.labelsFrame1, text = "Random", variable = self.order_var, value = 1).grid(row=3, column=1, sticky=W)
         self.label_sel_order = Label(self.labelsFrame1, text="Select order:").grid(row=2, column=0, sticky=W)
-
+        # TODO Add feature for calibration.
         # Check button for pauses
         #
         self.pause_var = IntVar()
@@ -146,8 +147,10 @@ class StudyGui(object):
         self.study = True
 
 
+
     def betweenImage(self):
         self.study = False
+
 
 
     # ====================================
@@ -167,6 +170,7 @@ class StudyGui(object):
                     #self.caller.trigger(counter)
                     counter += 1
                     self.study_screen.after(self.time_var.get()*1000, showBlack, counter)
+                    self.betweenImage()
             else:
                 if counter < len(self.image_list):
                     self.im = self.image_list[self.ran_list[counter]]
@@ -174,6 +178,7 @@ class StudyGui(object):
                     #self.caller.trigger(counter)
                     counter += 1
                     self.study_screen.after(self.time_var.get()*1000, showBlack, counter)
+                    self.betweenImage()
 
         def randomize(self):
             ran_list = list(range(len(self.image_dir)))
@@ -184,8 +189,10 @@ class StudyGui(object):
             if self.pause_var.get() == 1:
                 self.image_label.configure(image=self.black_screen)
                 self.study_screen.after(3000, showImage, counter)
+                self.newImage()
             else:
                 showImage(counter)
+                self.newImage()
 
         def openImages(self):
             img_list = []
